@@ -22,7 +22,7 @@ from adafruit_pm25.i2c import PM25_I2C
 from cedargrove_unit_converter.temperature import celsius_to_fahrenheit
 from cedargrove_unit_converter.air_quality.co2_air_quality import co2_ppm_to_quality
 from cedargrove_unit_converter.air_quality.aqi_air_quality import concentration_to_aqi
-from air_mon_interpret.english_to_deutsch import interpret
+from cedargrove_unit_converter.air_quality.interpreter.english_to_deutsch import interpret
 from air_mon_config import *
 
 SCREEN_TITLE = "Air Quality"
@@ -309,7 +309,7 @@ for i in range(0, WIDTH - 28, point_width):
     aqi_trend_group.append(point)
 image_group.append(aqi_trend_group)
 
-# Define AQI sensor quality scale
+# Define AQI-US sensor quality scale
 if aqi_sensor_exists:
     aqi_good_scale = Rect(
         x=WIDTH - 10,
@@ -533,7 +533,7 @@ aqi_qual_label.anchor_point = (0.5, 0.5)
 aqi_qual_label.anchored_position = (((WIDTH - 20) // 4) * 3, HEIGHT // 4)
 image_group.append(aqi_qual_label)
 
-aqi_label = Label(font_0, text="AQI", color=BLUE)
+aqi_label = Label(font_0, text="AQI-US", color=BLUE)
 aqi_label.anchor_point = (0.5, 0)
 aqi_label.anchored_position = (((WIDTH - 20) // 4) * 3, 4 + (HEIGHT // 2))
 image_group.append(aqi_label)
