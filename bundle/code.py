@@ -79,7 +79,7 @@ except:
     aqi_sensor_exists = False
 
 aqi_sensor_exists = True  # ### TEMPORARY SETTING
-# co2_sensor_exists = False # ### TEMPORARY SETTING
+#co2_sensor_exists = False # ### TEMPORARY SETTING
 
 # Instantiate display, fonts, speaker, and neopixels
 display = board.DISPLAY
@@ -556,9 +556,9 @@ play_tone(440, 0.1)  # A4
 play_tone(880, 0.1)  # A5
 
 if not co2_sensor_exists:
-    flash_status("NO CO2 SENSOR", 2.0)
+    flash_status(interpret(TRANSLATE, "NO CO2 SENSOR"), 2.0)
 if not aqi_sensor_exists:
-    flash_status("NO AQI SENSOR", 2.0)
+    flash_status(interpret(TRANSLATE, "NO AQI SENSOR"), 2.0)
 
 # ###--- PRIMARY PROCESS LOOP ---###
 t0 = time.monotonic()  # Reset sensor interval timer
