@@ -22,7 +22,7 @@ from adafruit_pm25.i2c import PM25_I2C
 from cedargrove_unit_converter.temperature import celsius_to_fahrenheit
 from cedargrove_unit_converter.air_quality.co2_air_quality import co2_ppm_to_quality
 from cedargrove_unit_converter.air_quality.aqi_air_quality import concentration_to_aqi
-from air_mon_interpret.english_to_deutch import interpret
+from air_mon_interpret.english_to_deutsch import interpret
 from air_mon_config import *
 
 SCREEN_TITLE = "Air Quality"
