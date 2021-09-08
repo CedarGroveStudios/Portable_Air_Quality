@@ -1,5 +1,5 @@
 # english_to_deutch.py
-# English to German
+# English to Deutch (German)
 
 ENG_DEUTCH = {
     "Air Quality" : "Raumluftqualität",

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # air_monitor_code.py
-# 2021-09-07 v1.6.1
+# 2021-09-08 v1.6.2
 
 import time
 import board
@@ -19,9 +19,9 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
 import adafruit_scd30
 from adafruit_pm25.i2c import PM25_I2C
-from thermal_cam_converters import celsius_to_fahrenheit
-from air_quality.co2_air_quality import co2_ppm_to_quality
-from air_quality.aqi_air_quality import concentration_to_aqi
+from cedargrove_unit_converter.temperature import celsius_to_fahrenheit
+from cedargrove_unit_converter.air_quality.co2_air_quality import co2_ppm_to_quality
+from cedargrove_unit_converter.air_quality.aqi_air_quality import concentration_to_aqi
 from air_mon_interpret.english_to_deutch import interpret
 from air_mon_config import *
 
@@ -65,26 +65,18 @@ try:
     scd = adafruit_scd30.SCD30(i2c)
     co2_sensor_exists = True
 except:
-    print("---------------------")
     print("--- SCD30 SENSOR  ---")
     print("--- NOT CONNECTED ---")
-    print("---------------------")
     co2_sensor_exists = False
-    """while True:
-        pass"""
 
 # Instantiate AQI sensor
 try:
     pm25 = PM25_I2C(i2c)
     aqi_sensor_exists = True
 except:
-    print("---------------------")
     print("---  PM25 SENSOR  ---")
     print("--- NOT CONNECTED ---")
-    print("---------------------")
     aqi_sensor_exists = False
-    """while True:
-        pass"""
 
 aqi_sensor_exists = True  # ### TEMPORARY SETTING
 # co2_sensor_exists = False # ### TEMPORARY SETTING
@@ -154,7 +146,12 @@ def update_co2_image_frame(blocking=False, wait_time=3):
             # Retrieve CO2 sensor data and round value
             sensor_co2 = round(scd.CO2)
             # Get the CO2 quality evaluation descriptor
-            sensor_data_valid, sensor_co2 , co2_qual_label.color, label = co2_ppm_to_quality(sensor_co2)
+            (
+                sensor_data_valid,
+                sensor_co2,
+                co2_qual_label.color,
+                label,
+            ) = co2_ppm_to_quality(sensor_co2)
             # Normalized to 0.0 to 1.0 (for plotting)
             sensor_co2_norm = sensor_co2 / 6000
             # Retrieve humidity data and round value
@@ -190,8 +187,6 @@ def update_co2_image_frame(blocking=False, wait_time=3):
                 co2_trend_group[len(co2_trend_chart) - i - 1].fill = GRAY
             co2_trend_chart.pop(0)  # remove oldest point from trend
             co2_trend_chart.append(sensor_co2_norm)  # add latest point
-
-    # watchdog.fill = YELLOW_DK  # Data acquisition indicator: completed
     return sensor_data_valid
 
 
@@ -205,7 +200,9 @@ def update_aqi_image_frame(blocking=False, wait_time=3):
         # ### STAND-IN FOR REAL AQI DATA ###
         sensor_pm25 = random.randrange(0, 15) + 50
 
-        flag, sensor_aqi , aqi_qual_label.color, label = concentration_to_aqi(sensor_pm25)
+        flag, sensor_aqi, aqi_qual_label.color, label = concentration_to_aqi(
+            sensor_pm25
+        )
         sensor_aqi_norm = sensor_aqi / 500
         # ### STAND-IN FOR REAL AQI DATA ###
 
@@ -232,8 +229,6 @@ def update_aqi_image_frame(blocking=False, wait_time=3):
             aqi_trend_group[len(aqi_trend_chart) - i - 1].fill = PURPLE
         aqi_trend_chart.pop(0)  # remove oldest point from trend
         aqi_trend_chart.append(sensor_aqi_norm)  # add latest point
-
-    # watchdog.fill = YELLOW_DK  # Data acquisition indicator: completed
     return sensor_data_valid
 
 
@@ -280,11 +275,9 @@ co2_trend_group = displayio.Group()
 aqi_trend_group = displayio.Group()
 reference_group = displayio.Group()
 
-
-# Define co2 trend chart group
+# Define co2 trend chart group and points area
 co2_trend_chart = []
-# Define co2 trend points area
-point_width = int((WIDTH - 28) / 40)  # Save memory on large displays
+point_width = int((WIDTH - 28) / 40)  # 40 trend points
 for i in range(0, WIDTH - 28, point_width):
     point = Rect(
         x=(WIDTH - 28) - i,
@@ -299,10 +292,9 @@ for i in range(0, WIDTH - 28, point_width):
     co2_trend_group.append(point)
 image_group.append(co2_trend_group)
 
-# Define aqi trend chart group
+# Define aqi trend chart group and points area
 aqi_trend_chart = []
-# Define aqi trend points area
-point_width = int((WIDTH - 28) / 40)  # Save memory on large displays
+point_width = int((WIDTH - 28) / 40)  # 40 trend points
 for i in range(0, WIDTH - 28, point_width):
     point = Rect(
         x=(WIDTH - 28) - i,
@@ -321,125 +313,114 @@ image_group.append(aqi_trend_group)
 if aqi_sensor_exists:
     aqi_good_scale = Rect(
         x=WIDTH - 10,
-        y=0,
+        y=HEIGHT - int((50 / 500) * HEIGHT),
         width=10,
         height=int(((50 - 0) / 500) * HEIGHT) + 3,
         fill=GREEN,
         outline=BLACK,
         stroke=1,
     )
-    aqi_good_scale.y = HEIGHT - int((50 / 500) * HEIGHT)
     reference_group.append(aqi_good_scale)
 
     aqi_moderate_scale = Rect(
         x=WIDTH - 10,
-        y=0,
+        y=HEIGHT - int((100 / 500) * HEIGHT),
         width=10,
         height=int(((100 - 50) / 500) * HEIGHT) + 3,
         fill=YELLOW,
         outline=BLACK,
         stroke=1,
     )
-    aqi_moderate_scale.y = HEIGHT - int((100 / 500) * HEIGHT)
     reference_group.append(aqi_moderate_scale)
 
     aqi_sens_unhealthy_scale = Rect(
         x=WIDTH - 10,
-        y=0,
+        y=HEIGHT - int((150 / 500) * HEIGHT),
         width=10,
         height=int(((150 - 100) / 500) * HEIGHT) + 3,
         fill=ORANGE,
         outline=BLACK,
         stroke=1,
     )
-    aqi_sens_unhealthy_scale.y = HEIGHT - int((150 / 500) * HEIGHT)
     reference_group.append(aqi_sens_unhealthy_scale)
 
     aqi_unhealthy_scale = Rect(
         x=WIDTH - 10,
-        y=0,
+        y=HEIGHT - int((200 / 500) * HEIGHT),
         width=10,
         height=int(((200 - 150) / 500) * HEIGHT) + 3,
         fill=RED,
         outline=BLACK,
         stroke=1,
     )
-    aqi_unhealthy_scale.y = HEIGHT - int((200 / 500) * HEIGHT)
     reference_group.append(aqi_unhealthy_scale)
 
     aqi_very_unhealthy_scale = Rect(
         x=WIDTH - 10,
-        y=0,
+        y=HEIGHT - int((300 / 500) * HEIGHT),
         width=10,
         height=int(((300 - 200) / 500) * HEIGHT) + 3,
         fill=PURPLE,
         outline=BLACK,
         stroke=1,
     )
-    aqi_very_unhealthy_scale.y = HEIGHT - int((300 / 500) * HEIGHT)
     reference_group.append(aqi_very_unhealthy_scale)
 
     aqi_hazardous_scale = Rect(
         x=WIDTH - 10,
-        y=0,
+        y=HEIGHT - int((500 / 500) * HEIGHT),
         width=10,
         height=int(((500 - 300) / 500) * HEIGHT) + 3,
         fill=MAROON,
         outline=BLACK,
         stroke=1,
     )
-    aqi_hazardous_scale.y = HEIGHT - int((500 / 500) * HEIGHT)
     reference_group.append(aqi_hazardous_scale)
-
 
 # Define CO2 sensor quality scale
 if co2_sensor_exists:
     co2_good_scale = Rect(
         x=WIDTH - 22,
-        y=0,
+        y=HEIGHT - int((1000 / 6000) * HEIGHT),
         width=10,
         height=int(((1000 - 0) / 6000) * HEIGHT) + 3,
         fill=GREEN,
         outline=BLACK,
         stroke=1,
     )
-    co2_good_scale.y = HEIGHT - int((1000 / 6000) * HEIGHT)
     reference_group.append(co2_good_scale)
 
     co2_poor_scale = Rect(
         x=WIDTH - 22,
-        y=0,
+        y=HEIGHT - int((2000 / 6000) * HEIGHT),
         width=10,
         height=int(((2000 - 1000) / 6000) * HEIGHT) + 3,
         fill=YELLOW,
         outline=BLACK,
         stroke=1,
     )
-    co2_poor_scale.y = HEIGHT - int((2000 / 6000) * HEIGHT)
     reference_group.append(co2_poor_scale)
 
     co2_warning_scale = Rect(
         x=WIDTH - 22,
-        y=0,
+        y=HEIGHT - int((5000 / 6000) * HEIGHT),
         width=10,
         height=int(((5000 - 2000) / 6000) * HEIGHT) + 3,
         fill=ORANGE,
         outline=BLACK,
         stroke=1,
     )
-    co2_warning_scale.y = HEIGHT - int((5000 / 6000) * HEIGHT)
     reference_group.append(co2_warning_scale)
 
     co2_danger_scale = Rect(
         x=WIDTH - 22,
-        y=0,
+        y=HEIGHT - int((6000 / 6000) * HEIGHT),
         width=10,
         height=int(((6000 - 5000) / 6000) * HEIGHT) + 3,
         fill=RED,
         outline=BLACK,
         stroke=1,
     )
-    co2_danger_scale.y = HEIGHT - int((6000 / 6000) * HEIGHT)
     reference_group.append(co2_danger_scale)
 
     co2_alarm_pointer_shadow = Rect(
@@ -450,14 +431,13 @@ if co2_sensor_exists:
 
     co2_alarm_pointer = Rect(
         x=WIDTH - 25,
-        y=0,
+        y=HEIGHT - int((CO2_ALARM[0] / 6000) * HEIGHT),
         width=12,
         height=3,
         fill=CO2_ALARM[1],
         outline=BLACK,
         stroke=1,
     )
-    co2_alarm_pointer.y = HEIGHT - int((CO2_ALARM[0] / 6000) * HEIGHT)
     reference_group.append(co2_alarm_pointer)
 
     image_group.append(reference_group)
@@ -499,7 +479,9 @@ status_label.anchor_point = (0.5, 0.5)
 status_label.anchored_position = ((WIDTH - 20) // 2, (HEIGHT // 2) + 27)
 image_group.append(status_label)
 
-co2_alarm_label = Label(font_0, text=interpret(TRANSLATE, CO2_ALARM[2]), color=CO2_ALARM[1])
+co2_alarm_label = Label(
+    font_0, text=interpret(TRANSLATE, CO2_ALARM[2]), color=CO2_ALARM[1]
+)
 co2_alarm_label.anchor_point = (0, 0)
 co2_alarm_label.anchored_position = (5, HEIGHT - 14)
 image_group.append(co2_alarm_label)
@@ -564,12 +546,11 @@ image_group.append(aqi_value)
 # ###--- PRIMARY PROCESS SETUP ---###
 # Activate display and play welcome tones
 display.show(image_group)
-scd.reset()  # Reset sensor
-scd.measurement_interval = SENSOR_INTERVAL  # Set the CO2 sensor acquisition interval
-sensor_valid = update_co2_image_frame(
-    blocking=True
-)  # Wait for then display sensor data
-update_aqi_image_frame(blocking=True)  # Wait for then display sensor data
+scd.reset()  # Reset sensor and set acquisition interval
+scd.measurement_interval = SENSOR_INTERVAL
+# Wait for sensor data and display
+sensor_valid = update_co2_image_frame(blocking=True)
+update_aqi_image_frame(blocking=True)
 
 play_tone(440, 0.1)  # A4
 play_tone(880, 0.1)  # A5
