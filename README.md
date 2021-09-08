@@ -14,4 +14,4 @@ The primary Portable Air Quality code module detects and adjusts automatically f
 
 Forced calibration is initiated by pressing the START button on the PyBadge/PyGamer/EdgeBadge. Calibration is currently not supported on other boards.
 
-![Image of Module](https://github.com/CedarGroveStudios/Portable_Air_Quality/blob/main/photos_and_graphics/co2_monitor_board_line-up.png)
+![Image of Module](https://github.com/CedarGroveStudios/Portable_Air_Quality/blob/main/photos_and_graphics/DSC06364.JPG)
