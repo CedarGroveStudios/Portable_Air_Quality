@@ -2,7 +2,7 @@
 # English to Deutch (German)
 
 ENG_DEUTCH = {
-    "Air Quality": "Raumluftqualität",
+    "Air Quality": "Luftqualität",
     "ALARM": "ALARM",
     "Alarm": "Alarm",
     "CALIBRATE": "KALIBRIEREN",
@@ -10,6 +10,7 @@ ENG_DEUTCH = {
     "ENGLISH": "DEUTCH",
     "GOOD": "GUT",
     "HAZARDOUS": "GEFÄHRLICH",
+    "Indoor Air Quality": "Raumluftqualität",
     "INVALID": "UNGÜLTIG",
     "LANGUAGE": "SPRACHE",
     "LOW BATTERY": "NIEDRIGER BATTERIE",
