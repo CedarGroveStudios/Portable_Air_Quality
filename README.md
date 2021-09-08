@@ -14,4 +14,6 @@ The primary Portable Air Quality code module detects and adjusts automatically f
 
 Forced calibration is initiated by pressing the _START_ button on the PyBadge/PyGamer/EdgeBadge. Pressing _SELECT_ changes temperature units. The _A_ button toggles between languages. Button selections are not supported on other boards at this time.
 
+Thank you to @effiksmusic for the German translation.
+
 ![Image of Module](https://github.com/CedarGroveStudios/Portable_Air_Quality/blob/main/photos_and_graphics/DSC06364.JPG)
