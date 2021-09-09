@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # air_monitor_code.py
-# 2021-09-08 v1.6.2
+# 2021-09-08 v1.6.3
 
 import time
 import board
@@ -548,8 +548,9 @@ image_group.append(aqi_value)
 # ###--- PRIMARY PROCESS SETUP ---###
 # Activate display and play welcome tones
 display.show(image_group)
-scd.reset()  # Reset sensor and set acquisition interval
-scd.measurement_interval = SENSOR_INTERVAL
+if co2_sensor_exists:
+    scd.reset()  # Reset sensor and set acquisition interval
+    scd.measurement_interval = SENSOR_INTERVAL
 # Wait for sensor data and display
 sensor_valid = update_co2_image_frame(blocking=True)
 update_aqi_image_frame(blocking=True)
@@ -570,7 +571,10 @@ while True:
         if button_pressed == "calibrate":  # Recalibrate mode selected (start)
             if hold_time >= 1.0:  # long press
                 flash_status(interpret(TRANSLATE, "CALIBRATE"), 0.5)
-                adafruit_scd30.forced_recalibration_reference = 400
+                if co2_sensor_exists:
+                    adafruit_scd30.forced_recalibration_reference = 400
+                else:
+                    flash_status(interpret(TRANSLATE, "NO CO2 SENSOR"), 0.5)
                 play_tone(440, 0.1)  # A4
         if button_pressed == "select":  # Toggle temperature units
             if hold_time >= 1.0:  # long press
