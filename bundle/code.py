@@ -22,7 +22,9 @@ from adafruit_pm25.i2c import PM25_I2C
 from cedargrove_unit_converter.temperature import celsius_to_fahrenheit
 from cedargrove_unit_converter.air_quality.co2_air_quality import co2_ppm_to_quality
 from cedargrove_unit_converter.air_quality.aqi_air_quality import concentration_to_aqi
-from cedargrove_unit_converter.air_quality.interpreter.english_to_deutsch import interpret
+from cedargrove_unit_converter.air_quality.interpreter.english_to_deutsch import (
+    interpret,
+)
 from air_mon_config import *
 
 SCREEN_TITLE = "Air Quality"
@@ -79,7 +81,7 @@ except:
     aqi_sensor_exists = False
 
 aqi_sensor_exists = True  # ### TEMPORARY SETTING
-#co2_sensor_exists = False # ### TEMPORARY SETTING
+# co2_sensor_exists = False # ### TEMPORARY SETTING
 
 # Instantiate display, fonts, speaker, and neopixels
 display = board.DISPLAY
