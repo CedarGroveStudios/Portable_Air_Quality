@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 # air_monitor_code.py
-# 2021-09-19 v1.7.0
+# 2021-09-20 v1.7.1
+
+# Only compatible with CircuitPython v7.0.0
 
 import time
 import board
@@ -33,39 +35,36 @@ if LANGUAGE == "ENGLISH":
 else:
     TRANSLATE = True
 
-board_type = os.uname().machine
+board_type = board.board_id
 print("Board:", board_type)
-if ("Pygamer" in board_type) or ("Pybadge" in board_type):
+if ("pygamer" == board_type) or ("pybadge" == board_type):
     import air_monitor_buttons.buttons_pybadge as air_monitor_panel
 
     has_speaker = True
     has_battery_mon = True
     battery_mon = AnalogIn(board.A6)
     trend_points = 40
-elif "PyPortal" in board_type:
+    i2c_freq = 95000  # Slow I2C bus for SC-30 I2C communication
+elif "pyportal" == board_type:
     import air_monitor_buttons.buttons_pyportal as air_monitor_panel
 
     has_speaker = True
     has_battery_mon = False
     trend_points = 40
-elif "CLUE" in board_type:
-    import air_monitor_buttons.buttons_clue as air_monitor_panel
-
-    has_speaker = False
-    has_battery_mon = False
-    trend_points = 30  # Adjusted for limited memory
-elif "FunHouse" in board_type:
+    i2c_freq = 95000  # Slow I2C bus for SC-30 I2C communication
+elif "funhouse" == board_type:
     import air_monitor_buttons.buttons_funhouse as air_monitor_panel
     has_speaker = False
     has_battery_mon = False
     trend_points = 40
+    i2c_freq = 95000  # Slow I2C bus for SC-30 I2C communication
 else:
     print("--- Incompatible board ---")
 
 panel = air_monitor_panel.Buttons()
 
-# Instantiate slow I2C bus frequency for sensors (50KHz)
-i2c = busio.I2C(board.SCL, board.SDA, frequency=50000)
+# Instantiate I2C bus
+i2c = busio.I2C(board.SCL, board.SDA, frequency=i2c_freq)
 
 # Instantiate CO2 sensor
 try:
