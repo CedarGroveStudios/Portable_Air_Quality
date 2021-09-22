@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # air_monitor_code.py
-# 2021-09-20 v1.7.1
+# 2021-09-21 v1.7.2
 
 # Only compatible with CircuitPython v7.0.0
 
@@ -84,7 +84,7 @@ except:
     print("---  NOT CONNECTED  ---")
     aqi_sensor_exists = False
 
-aqi_sensor_exists = True  # ### TEMPORARY SETTING
+# aqi_sensor_exists = False  # ### TEMPORARY SETTING
 # co2_sensor_exists = False # ### TEMPORARY SETTING
 
 # Instantiate display, fonts, speaker, and neopixels
@@ -114,6 +114,35 @@ else:
 
 
 # ### Helpers ###
+
+def sample_aq_sensor():
+    """Samples PM2.5 sensor
+    over a 2.3 second sample rate.
+
+    """
+    aq_reading = 0
+    aq_samples = []
+
+    # initial timestamp
+    time_start = time.monotonic()
+    # sample pm2.5 sensor over 2.3 sec sample rate
+    while time.monotonic() - time_start <= 2.3:
+        try:
+            aqdata = pm25.read()
+            aq_samples.append(aqdata["pm25 env"])
+        except RuntimeError:
+            print("Unable to read from sensor, retrying...")
+            continue
+        # pm sensor output rate of 1s
+        time.sleep(1)
+    # average sample reading / # samples
+    for sample in range(len(aq_samples)):
+        aq_reading += aq_samples[sample]
+    aq_reading = aq_reading / len(aq_samples)
+    aq_samples.clear()
+    return aq_reading
+
+
 def play_tone(freq=440, duration=0.01):
     """ Play tones through the integral speaker. """
     if has_speaker:
@@ -171,7 +200,7 @@ def update_co2_image_frame(blocking=False, wait_time=3):
             if sensor_co2 < 6000:
                 # Plot quality co2_pointer on scale; adjust fill color for sensor value
                 co2_pointer.fill = GRAY
-                co2_pointer.y = HEIGHT - int(sensor_co2_norm * HEIGHT)
+                co2_pointer.y = HEIGHT - int(sensor_co2_norm * HEIGHT) - 3
                 co2_pointer_shadow.y = co2_pointer.y
             else:
                 # If quality is out-of-range, pin the co2_pointer and show a warning
@@ -189,7 +218,7 @@ def update_co2_image_frame(blocking=False, wait_time=3):
             # Draw the CO2 trend chart bars
             for i in range(0, len(co2_trend_chart)):
                 co2_trend_group[len(co2_trend_chart) - i - 1].y = (
-                    HEIGHT - int(co2_trend_chart[i] * HEIGHT) + 1
+                    HEIGHT - int(co2_trend_chart[i] * HEIGHT) + 1 - 3
                 )
                 co2_trend_group[len(co2_trend_chart) - i - 1].fill = GRAY
             co2_trend_chart.pop(0)  # remove oldest point from trend
@@ -204,19 +233,21 @@ def update_aqi_image_frame(blocking=False, wait_time=3):
     return if the sensor data is not available."""
     sensor_data_valid = True  # Used for battery monitoring
     if aqi_sensor_exists:
-        # ### STAND-IN FOR REAL AQI DATA ###
+        """# ### STAND-IN FOR REAL AQI DATA ###
         sensor_pm25 = random.randrange(0, 15) + 50
+        sensor_pm25 = 0
+        # ### STAND-IN FOR REAL AQI DATA ###"""
 
+        sensor_pm25 = sample_aq_sensor()  # Get aqi sensor data
         flag, sensor_aqi, aqi_qual_label.color, label = concentration_to_aqi(
             sensor_pm25
         )
         sensor_aqi_norm = sensor_aqi / 500
-        # ### STAND-IN FOR REAL AQI DATA ###
 
         if sensor_aqi < 500:
             # Plot quality aqi_pointer on scale; adjust fill color for sensor value
             aqi_pointer.fill = PURPLE
-            aqi_pointer.y = HEIGHT - int(sensor_aqi_norm * HEIGHT)
+            aqi_pointer.y = HEIGHT - int(sensor_aqi_norm * HEIGHT) - 3
             aqi_pointer_shadow.y = aqi_pointer.y
         else:
             # If quality is out-of-range, pin the aqi_pointer and show a warning
@@ -231,7 +262,7 @@ def update_aqi_image_frame(blocking=False, wait_time=3):
         # Draw the AQI trend chart bars
         for i in range(0, len(aqi_trend_chart)):
             aqi_trend_group[len(aqi_trend_chart) - i - 1].y = (
-                HEIGHT - int(aqi_trend_chart[i] * HEIGHT) + 1
+                HEIGHT - int(aqi_trend_chart[i] * HEIGHT) + 1 - 3
             )
             aqi_trend_group[len(aqi_trend_chart) - i - 1].fill = PURPLE
         aqi_trend_chart.pop(0)  # remove oldest point from trend
@@ -501,17 +532,17 @@ image_group.append(co2_value)
 
 aqi_qual_label = Label(font_0, text=" ", color=None)
 aqi_qual_label.anchor_point = (0.5, 0.5)
-aqi_qual_label.anchored_position = (((WIDTH - 20) // 4) * 3, HEIGHT // 4)
+aqi_qual_label.anchored_position = (((WIDTH - 26) // 4) * 3, HEIGHT // 4)
 image_group.append(aqi_qual_label)
 
 aqi_label = Label(font_0, text="AQI-US", color=BLUE)
 aqi_label.anchor_point = (0.5, 0)
-aqi_label.anchored_position = (((WIDTH - 20) // 4) * 3, 4 + (HEIGHT // 2))
+aqi_label.anchored_position = (((WIDTH - 26) // 4) * 3, 4 + (HEIGHT // 2))
 image_group.append(aqi_label)
 
 aqi_value = Label(font_1, text=" " if aqi_sensor_exists else "---", color=WHITE)
 aqi_value.anchor_point = (0.5, 1.0)
-aqi_value.anchored_position = (((WIDTH - 20) // 4) * 3, (HEIGHT // 2))
+aqi_value.anchored_position = (((WIDTH - 26) // 4) * 3, (HEIGHT // 2))
 image_group.append(aqi_value)
 
 # Add button displayio group if defined by panel class
