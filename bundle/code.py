@@ -85,8 +85,8 @@ except:
     aqi_sensor_exists = False
 
     try:
-        # Connect the sensor TX pin to the PyBadge D2 3-pin connector
-        uart = busio.UART(board.TX, board.D2, baudrate=9600)
+        # Connect the sensor TX pin to the D3 3-pin connector
+        uart = busio.UART(board.TX, board.D3, baudrate=9600)
         from adafruit_pm25.uart import PM25_UART
         pm25 = PM25_UART(uart, None)
         pm25.read()  # will error if start-of-frame isn't seen
