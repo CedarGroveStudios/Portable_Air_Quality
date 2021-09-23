@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # air_monitor_code.py
-# 2021-09-21 v1.7.2
+# 2021-09-23 v1.7.3
 
 # Only compatible with CircuitPython v7.0.0
 
@@ -19,8 +19,6 @@ from simpleio import tone
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_shapes.rect import Rect
-import adafruit_scd30
-from adafruit_pm25.i2c import PM25_I2C
 from cedargrove_unit_converter.temperature import celsius_to_fahrenheit
 from cedargrove_unit_converter.air_quality.co2_air_quality import co2_ppm_to_quality
 from cedargrove_unit_converter.air_quality.aqi_air_quality import concentration_to_aqi
@@ -68,24 +66,35 @@ i2c = busio.I2C(board.SCL, board.SDA, frequency=i2c_freq)
 
 # Instantiate CO2 sensor
 try:
+    import adafruit_scd30
     scd = adafruit_scd30.SCD30(i2c)
     co2_sensor_exists = True
 except:
-    print("--- SCD30 I2C SENSOR ---")
-    print("---  NOT CONNECTED   ---")
+    print("-- SCD30 I2C SENSOR --")
+    print("--  NOT CONNECTED   --")
     co2_sensor_exists = False
 
-# Instantiate AQI sensor
+# Instantiate AQI sensor; try I2C then UART
 try:
+    from adafruit_pm25.i2c import PM25_I2C
     pm25 = PM25_I2C(i2c)
     aqi_sensor_exists = True
 except:
-    print("--- PM25 I2C SENSOR ---")
-    print("---  NOT CONNECTED  ---")
+    print("-- PM25 I2C SENSOR --")
+    print("--  NOT CONNECTED  --")
     aqi_sensor_exists = False
 
-# aqi_sensor_exists = False  # ### TEMPORARY SETTING
-# co2_sensor_exists = False # ### TEMPORARY SETTING
+    try:
+        # Connect the sensor TX pin to the PyBadge D2 3-pin connector
+        uart = busio.UART(board.TX, board.D2, baudrate=9600)
+        from adafruit_pm25.uart import PM25_UART
+        pm25 = PM25_UART(uart, None)
+        pm25.read()  # will error if start-of-frame isn't seen
+        aqi_sensor_exists = True
+    except:
+        print("-- PM25 UART SENSOR --")
+        print("--  NOT CONNECTED   --")
+        aqi_sensor_exists = False
 
 # Instantiate display, fonts, speaker, and neopixels
 display = board.DISPLAY

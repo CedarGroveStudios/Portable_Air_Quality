@@ -1,0 +1,84 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr USLetter 11000 8500
+encoding utf-8
+Sheet 1 1
+Title "AMG8833_Wing_Cover"
+Date "2021-06-02"
+Rev "v01"
+Comp "Cedar Grove Studios"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Adafruit_custom:Feather_M4_Express M1
+U 1 1 5F8BA244
+P 4400 3650
+F 0 "M1" H 4400 4623 50  0000 C CNN
+F 1 "Feather_M4_Express" H 4400 4650 50  0001 C CNN
+F 2 "Adafruit:Adafruit Feather" H 4400 3700 50  0001 C CNN
+F 3 "" H 4400 3700 50  0001 C CNN
+	1    4400 3650
+	1    0    0    -1  
+$EndComp
+NoConn ~ 3850 2850
+NoConn ~ 3850 3050
+NoConn ~ 3850 3250
+NoConn ~ 3850 3350
+NoConn ~ 3850 3450
+NoConn ~ 3850 3550
+NoConn ~ 3850 3650
+NoConn ~ 3850 3750
+NoConn ~ 3850 3850
+NoConn ~ 3850 3950
+NoConn ~ 3850 4050
+NoConn ~ 3850 4150
+NoConn ~ 3850 4250
+NoConn ~ 4950 4150
+NoConn ~ 4950 4050
+NoConn ~ 4950 3950
+NoConn ~ 4950 3850
+NoConn ~ 4950 3750
+NoConn ~ 4950 3550
+NoConn ~ 4950 3450
+NoConn ~ 4950 3350
+NoConn ~ 4950 3250
+NoConn ~ 3850 4350
+NoConn ~ 4950 3650
+NoConn ~ 4950 4250
+NoConn ~ 4950 4350
+NoConn ~ 3850 3150
+NoConn ~ 3850 2950
+$Comp
+L dk_Temperature-Sensors-Analog-and-Digital-Output:AMG8833 U1
+U 1 1 60B940E1
+P 6700 3725
+F 0 "U1" H 6700 3428 60  0000 C CNN
+F 1 "AMG8833" H 6700 3322 60  0000 C CNN
+F 2 "digikey_footprints:SMD-14_Grideye" H 6900 3925 60  0001 L CNN
+F 3 "https://media.digikey.com/pdf/Data%20Sheets/Panasonic%20Sensors%20PDFs/Grid-EYE_AMG88.pdf" H 6900 4025 60  0001 L CNN
+F 4 "P19002CT-ND" H 6900 4125 60  0001 L CNN "Digi-Key_PN"
+F 5 "AMG8833" H 6900 4225 60  0001 L CNN "MPN"
+F 6 "Sensors, Transducers" H 6900 4325 60  0001 L CNN "Category"
+F 7 "Temperature Sensors - Analog and Digital Output" H 6900 4425 60  0001 L CNN "Family"
+F 8 "https://media.digikey.com/pdf/Data%20Sheets/Panasonic%20Sensors%20PDFs/Grid-EYE_AMG88.pdf" H 6900 4525 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/panasonic-electronic-components/AMG8833/P19002CT-ND/5825306" H 6900 4625 60  0001 L CNN "DK_Detail_Page"
+F 10 "SENSOR DGTL 14SMD MODULE" H 6900 4725 60  0001 L CNN "Description"
+F 11 "Panasonic Electronic Components" H 6900 4825 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 6900 4925 60  0001 L CNN "Status"
+	1    6700 3725
+	1    0    0    -1  
+$EndComp
+NoConn ~ 6900 3025
+NoConn ~ 6800 3025
+NoConn ~ 6700 3025
+NoConn ~ 6600 3025
+NoConn ~ 6200 3225
+NoConn ~ 6200 3325
+NoConn ~ 6200 3425
+NoConn ~ 6200 3525
+NoConn ~ 6700 3925
+$EndSCHEMATC
