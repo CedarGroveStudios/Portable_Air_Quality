@@ -1,6 +1,7 @@
 # Cedar Grove Portable Air Quality Monitor
 
 ### _A portable CO2 and particulate air quality montor_
+### _CircuitPython v7.0.0_
 
 ## Overview
 
