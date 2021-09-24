@@ -10,7 +10,7 @@ The Portable Air Quality Monitor _bundle_ folder contains all the files and help
 
 Editable user-specified configuration parameters are stored in the _air_mon_config.py_ file. The configuration file specifies start-up temperature units, alarm thresholds, and language. Currently, English and German are the only supported languages in this version.
 
-The primary Portable Air Quality code module detects and adjusts automatically for display resolution including font size. The code was successfully tested on the EdgeBadge, PyPortal, PyPortal Pynt, PyPortal Titano, FunHouse, and Clue boards without requiring modification.
+The primary Portable Air Quality code module detects and adjusts automatically for display resolution including font size. The code was successfully tested on the PyBadge, PyGamer, EdgeBadge,  and PyPortal without requiring modification. Testing with the PyPortal Pynt, PyPortal Titano, and FunHouse are planned. Because of limited memory, the CLUE board will not be supported.
 
 Forced CO2 sensor calibration is initiated by pressing the _START_ button on the PyBadge/PyGamer/EdgeBadge. Pressing _SELECT_ changes temperature units. The _A_ button toggles between languages. Button selections are not supported on other boards at this time.
 
