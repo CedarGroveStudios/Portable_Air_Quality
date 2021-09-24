@@ -12,7 +12,11 @@ Editable user-specified configuration parameters are stored in the _air_mon_conf
 
 The primary Portable Air Quality code module detects and adjusts automatically for display resolution including font size. The code was successfully tested on the PyBadge, PyGamer, EdgeBadge,  and PyPortal without requiring modification. Testing with the PyPortal Pynt, PyPortal Titano, and FunHouse are planned. Because of limited memory, the CLUE board will not be supported.
 
-Forced CO2 sensor calibration is initiated by pressing the _START_ button on the PyBadge/PyGamer/EdgeBadge. Pressing _SELECT_ changes temperature units. The _A_ button toggles between languages. Button selections are not supported on other boards at this time.
+Forced CO2 sensor calibration is initiated by pressing and holding the START button on the PyBadge/PyGamer/EdgeBadge for one second. Forced calibration is initiated by touching and holding the middle portion of the PyPortal touchscreen or pressing and holding the FunHouse center button.
+
+Pressing and holding the PyBadge SELECT button changes temperature units. For other boards, touch and hold the lower portion of the PyPortal touchscreen or the FunHouse lower button.
+
+The PyBadge A button toggles between languages. To switch languages on the PyPortal, touch and hold the upper portion of the touchscreen. Press and hold the FunHouse top button to switch languages.
 
 Thank you to @effiksmusic for the German translation.
 
