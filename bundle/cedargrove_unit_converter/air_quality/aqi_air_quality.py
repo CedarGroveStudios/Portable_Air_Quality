@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # aqi_air_quality.py
-# 2021-09-07 version 1.0
+# 2021-09-21 version 1.1
 
 # EPA Air Quality Index (AQI) as derived from PM2.5 particulate concentration
 
@@ -67,7 +67,7 @@ def concentration_to_aqi(pm25_value):
     elif pm25_value > 12:
         aqi_value = int(map_range(pm25_value, 12, 35, 50, 100))
         return True, aqi_value, YELLOW, "MODERATE"
-    elif pm25_value > 0:
+    elif pm25_value >= 0:
         aqi_value = int(map_range(pm25_value, 0, 12, 0, 50))
         return True, aqi_value, GREEN, "GOOD"
     return False, -1, BLUE, "INVALID"
