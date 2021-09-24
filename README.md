@@ -8,7 +8,7 @@ The Portable Air Quality Monitor is a SCD-30 and PMSA003i -based ambient CO2 and
 
 The Portable Air Quality Monitor _bundle_ folder contains all the files and helpers needed for CircuitPython version 7.x.
 
-Editable user-specified configuration parameters are stored in the _air_mon_config.py_ file. The configuration file specifies start-up temperature units, alarm thresholds, and language. Currently, English and German are the only supported languages in this version.
+Editable user-specified configuration parameters are stored in the _air_mon_config.py_ file. The configuration file specifies start-up temperature units, alarm thresholds, and language. Currently, only English and German language translations are supported, but more are planned.
 
 The primary Portable Air Quality code module detects and adjusts automatically for display resolution including font size. The code was successfully tested on the PyBadge, PyGamer, EdgeBadge,  and PyPortal without requiring modification. Testing with the PyPortal Pynt, PyPortal Titano, and FunHouse are planned. Because of limited memory, the CLUE board will not be supported.
 
