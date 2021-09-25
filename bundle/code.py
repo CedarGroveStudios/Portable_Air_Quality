@@ -1,15 +1,14 @@
 # SPDX-FileCopyrightText: 2021 Cedar Grove Maker Studios
 # SPDX-License-Identifier: MIT
-
 # air_monitor_code.py
 # 2021-09-24 v1.7.4
-
 # Only compatible with CircuitPython v7.0.0
 
 import time
 import board
 import busio
 import os
+import gc
 import displayio
 import neopixel
 import random
@@ -586,6 +585,7 @@ play_tone(880, 0.1)  # A5
 # ###--- PRIMARY PROCESS LOOP ---###
 t0 = time.monotonic()  # Reset sensor interval timer
 while True:
+    gc.collect()
     panel.timeout = 1.0  # Set button hold time: long hold
     button_pressed, hold_time = panel.read_buttons()
     if button_pressed == "calibrate":  # Recalibrate mode selected
