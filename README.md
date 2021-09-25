@@ -19,6 +19,6 @@ Pressing and holding the PyBadge SELECT button changes temperature units. For ot
 
 The PyBadge A button toggles between languages. To switch languages on the PyPortal, touch and hold the upper portion of the touchscreen. Press and hold the FunHouse top button to switch languages.
 
-Thank you to @effiksmusic for the German translation.
+Thank you to @effiksmusic and @DavidGlaude for the alternate language translations. 
 
 ![Image of Module](https://github.com/CedarGroveStudios/Portable_Air_Quality/blob/main/photos_and_graphics/DSC06364.JPG)
