@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2021 Cedar Grove Maker Studios
 # SPDX-License-Identifier: MIT
 
-# air_monitor_code.py
-# 2021-09-24 v1.7.4 only compatible with CircuitPython v7.0.0
+# air_mon_code.py
+# 2021-09-25 v1.7.5 only compatible with CircuitPython v7.0.0
 
 import time
 import board
@@ -36,28 +36,28 @@ exec(
 board_type = board.board_id
 print("Board:", board_type)
 if ("pygamer" == board_type) or ("pybadge" == board_type):
-    import air_monitor_buttons.buttons_pybadge as air_monitor_panel
+    import air_mon_buttons.buttons_pybadge as air_mon_panel
 
     has_speaker = True
     has_battery_mon = True
     battery_mon = AnalogIn(board.A6)
-    trend_points = 40
+    trend_points = 32
 elif "pyportal" == board_type:
-    import air_monitor_buttons.buttons_pyportal as air_monitor_panel
+    import air_mon_buttons.buttons_pyportal as air_mon_panel
 
     has_speaker = True
     has_battery_mon = False
-    trend_points = 40
+    trend_points = 32
 elif "funhouse" == board_type:
-    import air_monitor_buttons.buttons_funhouse as air_monitor_panel
+    import air_mon_buttons.buttons_funhouse as air_mon_panel
 
     has_speaker = False
     has_battery_mon = False
-    trend_points = 40
+    trend_points = 32
 else:
     print("--- Incompatible board ---")
 
-panel = air_monitor_panel.Buttons()
+panel = air_mon_panel.Buttons()
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=95000)
 
@@ -107,7 +107,7 @@ else:
     font_0 = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
     font_1 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
 
-if hasattr(board, "SPEAKER_ENABLE"):
+if SOUND and hasattr(board, "SPEAKER_ENABLE"):
     speaker_enable = DigitalInOut(board.SPEAKER_ENABLE)
     speaker_enable.switch_to_output(value=True)
 
@@ -146,7 +146,7 @@ def sample_aq_sensor():
 
 def play_tone(freq=440, duration=0.01):
     # Play tones through the integral speaker.
-    if has_speaker:
+    if SOUND and has_speaker:
         tone(board.A0, freq, duration)
     return
 
