@@ -42,27 +42,24 @@ if ("pygamer" == board_type) or ("pybadge" == board_type):
     has_battery_mon = True
     battery_mon = AnalogIn(board.A6)
     trend_points = 40
-    i2c_freq = 95000
 elif "pyportal" == board_type:
     import air_monitor_buttons.buttons_pyportal as air_monitor_panel
 
     has_speaker = True
     has_battery_mon = False
     trend_points = 40
-    i2c_freq = 95000
 elif "funhouse" == board_type:
     import air_monitor_buttons.buttons_funhouse as air_monitor_panel
 
     has_speaker = False
     has_battery_mon = False
     trend_points = 40
-    i2c_freq = 95000
 else:
     print("--- Incompatible board ---")
 
 panel = air_monitor_panel.Buttons()
 
-i2c = busio.I2C(board.SCL, board.SDA, frequency=i2c_freq)
+i2c = busio.I2C(board.SCL, board.SDA, frequency=95000)
 
 try:
     import adafruit_scd30
