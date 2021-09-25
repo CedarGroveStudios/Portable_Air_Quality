@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # air_monitor_code.py
-# 2021-09-23 v1.7.3
+# 2021-09-24 v1.7.4
 
 # Only compatible with CircuitPython v7.0.0
 
@@ -22,16 +22,17 @@ from adafruit_display_shapes.rect import Rect
 from cedargrove_unit_converter.temperature import celsius_to_fahrenheit
 from cedargrove_unit_converter.air_quality.co2_air_quality import co2_ppm_to_quality
 from cedargrove_unit_converter.air_quality.aqi_air_quality import concentration_to_aqi
-from cedargrove_unit_converter.air_quality.interpreter.english_to_deutsch import (
-    interpret,
-)
+
 from air_mon_config import *
 
 SCREEN_TITLE = "Air Quality"
-if LANGUAGE == "ENGLISH":
-    TRANSLATE = False
-else:
-    TRANSLATE = True
+
+# Import translator for alternate language
+exec(
+    "from cedargrove_unit_converter.air_quality.interpreter.english_to_"
+    + ALT_LANGUAGE.lower()
+    + " import interpret"
+)
 
 board_type = board.board_id
 print("Board:", board_type)
@@ -52,6 +53,7 @@ elif "pyportal" == board_type:
     i2c_freq = 95000  # Slow I2C bus for SC-30 I2C communication
 elif "funhouse" == board_type:
     import air_monitor_buttons.buttons_funhouse as air_monitor_panel
+
     has_speaker = False
     has_battery_mon = False
     trend_points = 40
@@ -67,6 +69,7 @@ i2c = busio.I2C(board.SCL, board.SDA, frequency=i2c_freq)
 # Instantiate CO2 sensor
 try:
     import adafruit_scd30
+
     scd = adafruit_scd30.SCD30(i2c)
     co2_sensor_exists = True
 except:
@@ -77,6 +80,7 @@ except:
 # Instantiate AQI sensor; try I2C then UART
 try:
     from adafruit_pm25.i2c import PM25_I2C
+
     pm25 = PM25_I2C(i2c)
     aqi_sensor_exists = True
 except:
@@ -88,6 +92,7 @@ except:
         # Connect the sensor TX pin to the D3 3-pin connector
         uart = busio.UART(board.TX, board.D3, baudrate=9600)
         from adafruit_pm25.uart import PM25_UART
+
         pm25 = PM25_UART(uart, None)
         pm25.read()  # will error if start-of-frame isn't seen
         aqi_sensor_exists = True
@@ -123,6 +128,7 @@ else:
 
 
 # ### Helpers ###
+
 
 def sample_aq_sensor():
     """Samples PM2.5 sensor
