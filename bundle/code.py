@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2021 Cedar Grove Maker Studios
 # SPDX-License-Identifier: MIT
+
 # air_monitor_code.py
-# 2021-09-24 v1.7.4
-# Only compatible with CircuitPython v7.0.0
+# 2021-09-24 v1.7.4 only compatible with CircuitPython v7.0.0
 
 import time
 import board
@@ -26,7 +26,7 @@ from air_mon_config import *
 
 SCREEN_TITLE = "Air Quality"
 
-# Import translator for alternate language
+# Import translator for alt language
 exec(
     "from cedargrove_unit_converter.air_quality.interpreter.english_to_"
     + ALT_LANGUAGE.lower()
@@ -42,30 +42,28 @@ if ("pygamer" == board_type) or ("pybadge" == board_type):
     has_battery_mon = True
     battery_mon = AnalogIn(board.A6)
     trend_points = 40
-    i2c_freq = 95000  # Slow I2C bus for SC-30 I2C communication
+    i2c_freq = 95000
 elif "pyportal" == board_type:
     import air_monitor_buttons.buttons_pyportal as air_monitor_panel
 
     has_speaker = True
     has_battery_mon = False
     trend_points = 40
-    i2c_freq = 95000  # Slow I2C bus for SC-30 I2C communication
+    i2c_freq = 95000
 elif "funhouse" == board_type:
     import air_monitor_buttons.buttons_funhouse as air_monitor_panel
 
     has_speaker = False
     has_battery_mon = False
     trend_points = 40
-    i2c_freq = 95000  # Slow I2C bus for SC-30 I2C communication
+    i2c_freq = 95000
 else:
     print("--- Incompatible board ---")
 
 panel = air_monitor_panel.Buttons()
 
-# Instantiate I2C bus
 i2c = busio.I2C(board.SCL, board.SDA, frequency=i2c_freq)
 
-# Instantiate CO2 sensor
 try:
     import adafruit_scd30
 
@@ -76,7 +74,6 @@ except:
     print("--  NOT CONNECTED   --")
     co2_sensor_exists = False
 
-# Instantiate AQI sensor; try I2C then UART
 try:
     from adafruit_pm25.i2c import PM25_I2C
 
@@ -93,30 +90,30 @@ except:
         from adafruit_pm25.uart import PM25_UART
 
         pm25 = PM25_UART(uart, None)
-        pm25.read()  # will error if start-of-frame isn't seen
+        pm25.read()
         aqi_sensor_exists = True
     except:
         print("-- PM25 UART SENSOR --")
         print("--  NOT CONNECTED   --")
         aqi_sensor_exists = False
 
-# Instantiate display, fonts, speaker, and neopixels
+
 display = board.DISPLAY
 display.brightness = BRIGHTNESS
 WIDTH = display.width
 HEIGHT = display.height
-# Load the text font from the fonts folder
+
 if WIDTH > 160:
     font_0 = bitmap_font.load_font("/fonts/OpenSans-12.bdf")
     font_1 = bitmap_font.load_font("/fonts/Helvetica-Bold-36.bdf")
 else:
     font_0 = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
     font_1 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
-# Turn on speaker output
+
 if hasattr(board, "SPEAKER_ENABLE"):
     speaker_enable = DigitalInOut(board.SPEAKER_ENABLE)
     speaker_enable.switch_to_output(value=True)
-# Set NeoPixel brightness and clear all pixels
+
 if hasattr(board, "NEOPIXEL"):
     has_neopixel = True
     pixels = neopixel.NeoPixel(board.NEOPIXEL, 5, pixel_order=neopixel.GRB)
@@ -126,20 +123,14 @@ else:
     has_neopixel = False
 
 
-# ### Helpers ###
+# - Helpers -
 
 
 def sample_aq_sensor():
-    """Samples PM2.5 sensor
-    over a 2.3 second sample rate.
-
-    """
+    # Sample PM2.5 sensor over 2.3 seconds
     aq_reading = 0
     aq_samples = []
-
-    # initial timestamp
     time_start = time.monotonic()
-    # sample pm2.5 sensor over 2.3 sec sample rate
     while time.monotonic() - time_start <= 2.3:
         try:
             aqdata = pm25.read()
@@ -147,9 +138,8 @@ def sample_aq_sensor():
         except RuntimeError:
             print("Unable to read from sensor, retrying...")
             continue
-        # pm sensor output rate of 1s
         time.sleep(1)
-    # average sample reading / # samples
+
     for sample in range(len(aq_samples)):
         aq_reading += aq_samples[sample]
     aq_reading = aq_reading / len(aq_samples)
@@ -158,14 +148,14 @@ def sample_aq_sensor():
 
 
 def play_tone(freq=440, duration=0.01):
-    """ Play tones through the integral speaker. """
+    # Play tones through the integral speaker.
     if has_speaker:
         tone(board.A0, freq, duration)
     return
 
 
 def flash_status(text="", duration=0.05):
-    """ Flash a status message once. """
+    # Flash a status message once.
     status_label.color = WHITE
     status_label.text = text
     time.sleep(duration)
@@ -176,11 +166,11 @@ def flash_status(text="", duration=0.05):
 
 
 def update_co2_image_frame(blocking=False, wait_time=3):
-    """Acquire SCD-30 data and update the display, returning sensor health flag.
-    When blocking = True, the function will wait until the sensor is ready, up
-    to 3 seconds (default). When blocking = False, the function will immediately
-    return if the sensor data is not available."""
-    sensor_data_valid = True  # Used for battery monitoring
+    """Acquire SCD-30 data and update the display. Return sensor health flag.
+    When blocking = True, wait until the sensor is ready, up
+    to 3 seconds. When blocking = False, immediately
+    return when sensor data not available."""
+    sensor_data_valid = True
     if co2_sensor_exists:
         t0 = time.monotonic()
         while (
@@ -192,66 +182,54 @@ def update_co2_image_frame(blocking=False, wait_time=3):
             flash_status(interpret(TRANSLATE, "WARMUP"), 0.5)
 
         if scd.data_available:
-            watchdog.fill = YELLOW  # Data acquisition indicator: active
-            # Retrieve CO2 sensor data and round value
+            watchdog.fill = YELLOW
+            # Get CO2 sensor data
             sensor_co2 = round(scd.CO2)
-            # Get the CO2 quality evaluation descriptor
             (
                 sensor_data_valid,
                 sensor_co2,
                 co2_qual_label.color,
                 label,
             ) = co2_ppm_to_quality(sensor_co2)
-            # Normalized to 0.0 to 1.0 (for plotting)
             sensor_co2_norm = sensor_co2 / 6000
-            # Retrieve humidity data and round value
             sensor_rh = round(scd.relative_humidity)
-            # Retrieve temperature data and round value
             sensor_temp = round(scd.temperature)
-            if TEMP_UNIT == "F":  # Convert to Fahrenheit if required
+            if TEMP_UNIT == "F":
                 sensor_temp = round(celsius_to_fahrenheit(sensor_temp))
 
             if sensor_co2 < 6000:
-                # Plot quality co2_pointer on scale; adjust fill color for sensor value
                 co2_pointer.fill = GRAY
                 co2_pointer.y = HEIGHT - int(sensor_co2_norm * HEIGHT) - 3
                 co2_pointer_shadow.y = co2_pointer.y
             else:
-                # If quality is out-of-range, pin the co2_pointer and show a warning
                 co2_pointer.fill = CO2_ALARM[1]
                 co2_poointer_shadow.y = co2_pointer.y = 0
                 flash_status(interpret(TRANSLATE, "OVERRANGE"), 0.75)
 
-            # Update on-screen values
             co2_qual_label.text = interpret(TRANSLATE, label)
             co2_value.text = str(sensor_co2)
             co2_humid_value.text = str(sensor_rh)
             co2_temp_value.text = str(sensor_temp)
             co2_alarm_value.text = str(CO2_ALARM[0])
 
-            # Draw the CO2 trend chart bars
+            # Trend chart
             for i in range(0, len(co2_trend_chart)):
                 co2_trend_group[len(co2_trend_chart) - i - 1].y = (
                     HEIGHT - int(co2_trend_chart[i] * HEIGHT) + 1 - 3
                 )
                 co2_trend_group[len(co2_trend_chart) - i - 1].fill = GRAY
-            co2_trend_chart.pop(0)  # remove oldest point from trend
-            co2_trend_chart.append(sensor_co2_norm)  # add latest point
+            co2_trend_chart.pop(0)
+            co2_trend_chart.append(sensor_co2_norm)
     return sensor_data_valid
 
 
 def update_aqi_image_frame(blocking=False, wait_time=3):
-    """Acquire PM25 data and update the display, returning sensor health flag.
-    When blocking = True, the function will wait until the sensor is ready, up
-    to 3 seconds (default). When blocking = False, the function will immediately
-    return if the sensor data is not available."""
-    sensor_data_valid = True  # Used for battery monitoring
+    """Acquire PM25 data and update the display. Return sensor health flag.
+    When blocking = True, wait until the sensor is ready, up
+    to 3 seconds. When blocking = False, immediately
+    return when sensor data not available."""
+    sensor_data_valid = True
     if aqi_sensor_exists:
-        """# ### STAND-IN FOR REAL AQI DATA ###
-        sensor_pm25 = random.randrange(0, 15) + 50
-        sensor_pm25 = 0
-        # ### STAND-IN FOR REAL AQI DATA ###"""
-
         sensor_pm25 = sample_aq_sensor()  # Get aqi sensor data
         flag, sensor_aqi, aqi_qual_label.color, label = concentration_to_aqi(
             sensor_pm25
@@ -259,40 +237,36 @@ def update_aqi_image_frame(blocking=False, wait_time=3):
         sensor_aqi_norm = sensor_aqi / 500
 
         if sensor_aqi < 500:
-            # Plot quality aqi_pointer on scale; adjust fill color for sensor value
             aqi_pointer.fill = PURPLE
             aqi_pointer.y = HEIGHT - int(sensor_aqi_norm * HEIGHT) - 3
             aqi_pointer_shadow.y = aqi_pointer.y
         else:
-            # If quality is out-of-range, pin the aqi_pointer and show a warning
             aqi_pointer.fill = RED
             aqi_pointer_shadow.y = aqi_pointer.y = 0
             flash_status(interpret(TRANSLATE, "OVERRANGE"), 0.75)
 
-        # Update on-screen values
         aqi_qual_label.text = interpret(TRANSLATE, label)
         aqi_value.text = str(sensor_aqi)
 
-        # Draw the AQI trend chart bars
+        # Trend chart
         for i in range(0, len(aqi_trend_chart)):
             aqi_trend_group[len(aqi_trend_chart) - i - 1].y = (
                 HEIGHT - int(aqi_trend_chart[i] * HEIGHT) + 1 - 3
             )
             aqi_trend_group[len(aqi_trend_chart) - i - 1].fill = PURPLE
-        aqi_trend_chart.pop(0)  # remove oldest point from trend
-        aqi_trend_chart.append(sensor_aqi_norm)  # add latest point
+        aqi_trend_chart.pop(0)
+        aqi_trend_chart.append(sensor_aqi_norm)
     return sensor_data_valid
 
 
-play_tone(880, 0.1)  # A5
+play_tone(880, 0.1)
 
-# ### Define the display groups ###
+# Define the display groups
 image_group = displayio.Group()
 co2_trend_group = displayio.Group()
 aqi_trend_group = displayio.Group()
 reference_group = displayio.Group()
 
-# Define co2 trend chart group and points area
 co2_trend_chart = []
 point_width = int((WIDTH - 28) / trend_points)
 for i in range(0, WIDTH - 28, point_width):
@@ -309,7 +283,6 @@ for i in range(0, WIDTH - 28, point_width):
     co2_trend_group.append(point)
 image_group.append(co2_trend_group)
 
-# Define aqi trend chart group and points area
 aqi_trend_chart = []
 point_width = int((WIDTH - 28) / trend_points)
 for i in range(0, WIDTH - 28, point_width):
@@ -326,7 +299,6 @@ for i in range(0, WIDTH - 28, point_width):
     aqi_trend_group.append(point)
 image_group.append(aqi_trend_group)
 
-# Define AQI-US sensor quality scale
 if aqi_sensor_exists:
     aqi_good_scale = Rect(
         x=WIDTH - 10,
@@ -394,7 +366,6 @@ if aqi_sensor_exists:
     )
     reference_group.append(aqi_hazardous_scale)
 
-# Define CO2 sensor quality scale
 if co2_sensor_exists:
     co2_good_scale = Rect(
         x=WIDTH - 22,
@@ -458,7 +429,6 @@ if co2_sensor_exists:
     reference_group.append(co2_alarm_pointer)
     image_group.append(reference_group)
 
-# Define co2 pointer
 co2_pointer_shadow = Rect(
     x=WIDTH - 25, y=HEIGHT + 2, width=12, height=6, fill=None, outline=BLACK, stroke=1
 )
@@ -469,7 +439,6 @@ co2_pointer = Rect(
 )
 image_group.append(co2_pointer)
 
-# Define aqi pointer
 aqi_pointer_shadow = Rect(
     x=WIDTH - 12, y=HEIGHT + 2, width=11, height=6, fill=None, outline=BLACK, stroke=1
 )
@@ -480,11 +449,9 @@ aqi_pointer = Rect(
 )
 image_group.append(aqi_pointer)
 
-# Define watchdog indicator
 watchdog = Rect(x=1, y=1, width=10, height=10, fill=None, outline=YELLOW, stroke=1)
 image_group.append(watchdog)
 
-# Define titles, labels, and values for the image group
 title_label = Label(font_0, text=interpret(TRANSLATE, SCREEN_TITLE), color=CYAN)
 title_label.anchor_point = (0.5, 0)
 title_label.anchored_position = ((WIDTH - 20) // 2, 0)
@@ -559,17 +526,15 @@ aqi_value.anchor_point = (0.5, 1.0)
 aqi_value.anchored_position = (((WIDTH - 26) // 4) * 3, (HEIGHT // 2))
 image_group.append(aqi_value)
 
-# Add button displayio group if defined by panel class
+# Add panel class group
 if panel.button_display_group:
     image_group.append(panel.button_display_group)
 
-# ###--- PRIMARY PROCESS SETUP ---###
-# Activate display and play welcome tones
+# - PRIMARY PROCESS SETUP -
 display.show(image_group)
 if co2_sensor_exists:
-    scd.reset()  # Reset sensor and set acquisition interval
+    scd.reset()
     scd.measurement_interval = SENSOR_INTERVAL
-    # Wait for sensor data and display
     sensor_valid = update_co2_image_frame(blocking=True)
 else:
     flash_status(interpret(TRANSLATE, "NO CO2 SENSOR"), 2.0)
@@ -579,17 +544,16 @@ if aqi_sensor_exists:
 else:
     flash_status(interpret(TRANSLATE, "NO AQI SENSOR"), 2.0)
 
-play_tone(440, 0.1)  # A4
-play_tone(880, 0.1)  # A5
+play_tone(440, 0.1)
+play_tone(880, 0.1)
 
-# ###--- PRIMARY PROCESS LOOP ---###
-t0 = time.monotonic()  # Reset sensor interval timer
+# - PRIMARY PROCESS LOOP -
+t0 = time.monotonic()  # Sensor interval timer
 while True:
     gc.collect()
-    panel.timeout = 1.0  # Set button hold time: long hold
     button_pressed, hold_time = panel.read_buttons()
-    if button_pressed == "calibrate":  # Recalibrate mode selected
-        if hold_time >= 1.0:  # long press
+    if button_pressed == "calibrate":  # Recalibrate CO2 sensor
+        if hold_time >= 1.0:
             if co2_sensor_exists:
                 flash_status(interpret(TRANSLATE, "CALIBRATE"), 0.5)
                 scd.forced_recalibration_reference = 400
@@ -598,28 +562,28 @@ while True:
                 flash_status(interpret(TRANSLATE, "NO CO2 SENSOR"), 0.5)
             play_tone(440, 0.1)  # A4
     if button_pressed == "temperature":  # Toggle temperature units
-        if hold_time >= 1.0:  # long press
+        if hold_time >= 1.0:
             flash_status(interpret(TRANSLATE, "TEMPERATURE"), 0.5)
             if TEMP_UNIT == "F":
                 TEMP_UNIT = "C"
             else:
                 TEMP_UNIT = "F"
             co2_temp_label.text = "°" + TEMP_UNIT
-            play_tone(440, 0.1)  # A4
+            play_tone(440, 0.1)
     if button_pressed == "language":  # Toggle language
-        if hold_time >= 1.0:  # long press
+        if hold_time >= 1.0:
             flash_status(interpret(TRANSLATE, "LANGUAGE"), 0.5)
             TRANSLATE = not TRANSLATE
             title_label.text = interpret(TRANSLATE, SCREEN_TITLE)
             co2_alarm_label.text = interpret(TRANSLATE, CO2_ALARM[2])
-            play_tone(440, 0.1)  # A4
+            play_tone(440, 0.1)
             if TRANSLATE:
                 flash_status(interpret(True, "ENGLISH"), 0.5)
             else:
                 flash_status("ENGLISH", 0.5)
 
     if time.monotonic() - SENSOR_INTERVAL > t0:
-        # If available, acquire sensor data and update display
+        # Acquire sensors
         sensor_valid = update_co2_image_frame()
         update_aqi_image_frame()
         t0 = time.monotonic()
@@ -628,7 +592,7 @@ while True:
         watchdog.x = int(((time.monotonic() - t0) / SENSOR_INTERVAL) * 10) - 10
         watchdog.y = watchdog.x
 
-    # If CO2 alarm threshold is reached, flash NeoPixels, ALARM status, and play alarm tone
+    # Test CO2 alarm threshold
     if co2_sensor_exists:
         if co2_value.text != " " and float(co2_value.text) >= CO2_ALARM[0]:
             flash_status(interpret(TRANSLATE, "ALARM"), 0.75)
@@ -639,10 +603,7 @@ while True:
                 pixels.fill(BLACK)
 
     if has_battery_mon:
-        """Warns when battery voltage is low and the sensor data is potentially
-        invalid (measured value is less than 100). The 3.3-volt threshold is an
-        approximation since an individual board's battery monitoring circuitry
-        can vary +/-10% due to internal voltage divider resistor tolerance."""
+        # Low battery or invalid CO2 sensor data warning
         battery_volts = round(battery_mon.value * 6.6 / 0xFFF0, 2)
         if (not sensor_valid) and battery_volts < 3.3:
             play_tone(880, 0.030)  # A5
