@@ -1,7 +1,8 @@
-# english_to_francaise.py
-# English to Française (French)
+# english_to_francais.py
+# English to Français (French)
+# Thank you to @DavidGlaude for the translation!
 
-ENG_FRANCAISE = {
+ENG_FRANCAIS = {
     "Air Quality": "Qualité de l'air",
     "ALARM": "ALARME",
     "Alarm": "Alarme",
@@ -29,6 +30,6 @@ ENG_FRANCAISE = {
 def interpret(enable, english_phrase):
     # returns translated phrase or original phrase
     if enable:
-        if english_phrase in ENG_FRANCAISE:
-            return ENG_FRANCAISE[english_phrase]
+        if english_phrase in ENG_FRANCAIS:
+            return ENG_FRANCAIS[english_phrase]
     return english_phrase
