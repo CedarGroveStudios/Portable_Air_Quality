@@ -24,38 +24,38 @@ from cedargrove_unit_converter.air_quality.aqi_air_quality import concentration_
 
 from air_mon_config import *
 
-SCREEN_TITLE = "Air Quality"
+SCREEN_TITLE = 'Air Quality'
 
 # Import translator for alt language
 exec(
-    "from cedargrove_unit_converter.air_quality.interpreter.english_to_"
+    'from cedargrove_unit_converter.air_quality.interpreter.english_to_'
     + ALT_LANGUAGE.lower()
-    + " import interpret"
+    + ' import interpret'
 )
 
 board_type = board.board_id
-print("Board:", board_type)
-if ("pygamer" == board_type) or ("pybadge" == board_type):
+print('Board:', board_type)
+if ('pygamer' == board_type) or ('pybadge' == board_type):
     import air_mon_buttons.buttons_pybadge as air_mon_panel
 
     has_speaker = True
     has_battery_mon = True
     battery_mon = AnalogIn(board.A6)
     trend_points = 32
-elif "pyportal" == board_type:
+elif 'pyportal' == board_type:
     import air_mon_buttons.buttons_pyportal as air_mon_panel
 
     has_speaker = True
     has_battery_mon = False
     trend_points = 32
-elif "funhouse" == board_type:
+elif 'funhouse' == board_type:
     import air_mon_buttons.buttons_funhouse as air_mon_panel
 
     has_speaker = False
     has_battery_mon = False
     trend_points = 32
 else:
-    print("--- Incompatible board ---")
+    print('--- Incompatible board ---')
 
 panel = air_mon_panel.Buttons()
 
@@ -67,8 +67,9 @@ try:
     scd = adafruit_scd30.SCD30(i2c)
     co2_sensor_exists = True
 except:
-    print("-- SCD30 I2C SENSOR --")
-    print("--  NOT CONNECTED   --")
+    print('')
+    print('-- SCD30 I2C SENSOR --')
+    print('--  NOT CONNECTED   --')
     co2_sensor_exists = False
 
 try:
@@ -77,21 +78,25 @@ try:
     pm25 = PM25_I2C(i2c)
     aqi_sensor_exists = True
 except:
-    print("-- PM25 I2C SENSOR --")
-    print("--  NOT CONNECTED  --")
+    print('')
+    print('-- PM25 I2C SENSOR --')
+    print('--  NOT CONNECTED  --')
     aqi_sensor_exists = False
 
+if not aqi_sensor_exists:
     try:
         # Connect the sensor TX pin to the D3 3-pin connector
-        uart = busio.UART(board.TX, board.D3, baudrate=9600)
+        uart = busio.UART(None, board.D3, baudrate=9600)
         from adafruit_pm25.uart import PM25_UART
 
         pm25 = PM25_UART(uart, None)
         pm25.read()
         aqi_sensor_exists = True
-    except:
-        print("-- PM25 UART SENSOR --")
-        print("--  NOT CONNECTED   --")
+    except RuntimeError as err:
+        print('')
+        print('-- PM25 UART SENSOR --')
+        print(err)
+        print('--  NOT CONNECTED   --')
         aqi_sensor_exists = False
 
 
@@ -101,17 +106,17 @@ WIDTH = display.width
 HEIGHT = display.height
 
 if WIDTH > 160:
-    font_0 = bitmap_font.load_font("/fonts/OpenSans-12.bdf")
-    font_1 = bitmap_font.load_font("/fonts/Helvetica-Bold-36.bdf")
+    font_0 = bitmap_font.load_font('/fonts/OpenSans-12.bdf')
+    font_1 = bitmap_font.load_font('/fonts/Helvetica-Bold-36.bdf')
 else:
-    font_0 = bitmap_font.load_font("/fonts/OpenSans-9.bdf")
-    font_1 = bitmap_font.load_font("/fonts/OpenSans-16.bdf")
+    font_0 = bitmap_font.load_font('/fonts/OpenSans-9.bdf')
+    font_1 = bitmap_font.load_font('/fonts/OpenSans-16.bdf')
 
-if SOUND and hasattr(board, "SPEAKER_ENABLE"):
+if SOUND and hasattr(board, 'SPEAKER_ENABLE'):
     speaker_enable = DigitalInOut(board.SPEAKER_ENABLE)
     speaker_enable.switch_to_output(value=True)
 
-if hasattr(board, "NEOPIXEL"):
+if hasattr(board, 'NEOPIXEL'):
     has_neopixel = True
     pixels = neopixel.NeoPixel(board.NEOPIXEL, 5, pixel_order=neopixel.GRB)
     pixels.brightness = 0.05
@@ -131,9 +136,9 @@ def sample_aq_sensor():
     while time.monotonic() - time_start <= 2.3:
         try:
             aqdata = pm25.read()
-            aq_samples.append(aqdata["pm25 env"])
+            aq_samples.append(aqdata['pm25 env'])
         except RuntimeError:
-            print("Unable to read from sensor, retrying...")
+            print('Unable to read from sensor, retrying...')
             continue
         time.sleep(1)
 
@@ -151,14 +156,14 @@ def play_tone(freq=440, duration=0.01):
     return
 
 
-def flash_status(text="", duration=0.05):
+def flash_status(text='', duration=0.05):
     # Flash a status message once.
     status_label.color = WHITE
     status_label.text = text
     time.sleep(duration)
     status_label.color = BLACK
     time.sleep(duration)
-    status_label.text = ""
+    status_label.text = ''
     return
 
 
@@ -176,7 +181,7 @@ def update_co2_image_frame(blocking=False, wait_time=3):
             and (t0 - time.monotonic() < wait_time)
         ):
             watchdog.fill = RED
-            flash_status(interpret(TRANSLATE, "WARMUP"), 0.5)
+            flash_status(interpret(TRANSLATE, 'WARMUP'), 0.5)
 
         if scd.data_available:
             watchdog.fill = YELLOW
@@ -191,7 +196,7 @@ def update_co2_image_frame(blocking=False, wait_time=3):
             sensor_co2_norm = sensor_co2 / 6000
             sensor_rh = round(scd.relative_humidity)
             sensor_temp = round(scd.temperature)
-            if TEMP_UNIT == "F":
+            if TEMP_UNIT == 'F':
                 sensor_temp = round(celsius_to_fahrenheit(sensor_temp))
 
             if sensor_co2 < 6000:
@@ -201,7 +206,7 @@ def update_co2_image_frame(blocking=False, wait_time=3):
             else:
                 co2_pointer.fill = CO2_ALARM[1]
                 co2_poointer_shadow.y = co2_pointer.y = 0
-                flash_status(interpret(TRANSLATE, "OVERRANGE"), 0.75)
+                flash_status(interpret(TRANSLATE, 'OVERRANGE'), 0.75)
 
             co2_qual_label.text = interpret(TRANSLATE, label)
             co2_value.text = str(sensor_co2)
@@ -240,7 +245,7 @@ def update_aqi_image_frame(blocking=False, wait_time=3):
         else:
             aqi_pointer.fill = RED
             aqi_pointer_shadow.y = aqi_pointer.y = 0
-            flash_status(interpret(TRANSLATE, "OVERRANGE"), 0.75)
+            flash_status(interpret(TRANSLATE, 'OVERRANGE'), 0.75)
 
         aqi_qual_label.text = interpret(TRANSLATE, label)
         aqi_value.text = str(sensor_aqi)
@@ -454,7 +459,7 @@ title_label.anchor_point = (0.5, 0)
 title_label.anchored_position = ((WIDTH - 20) // 2, 0)
 image_group.append(title_label)
 
-status_label = Label(font_0, text=" ", color=None)
+status_label = Label(font_0, text=' ', color=None)
 status_label.anchor_point = (0.5, 0.5)
 status_label.anchored_position = ((WIDTH - 20) // 2, (HEIGHT // 2) + 27)
 image_group.append(status_label)
@@ -467,58 +472,58 @@ co2_alarm_label.anchored_position = (5, HEIGHT - 14)
 image_group.append(co2_alarm_label)
 
 co2_alarm_value = Label(
-    font_0, text=str(CO2_ALARM[0]) if co2_sensor_exists else "----", color=CO2_ALARM[1]
+    font_0, text=str(CO2_ALARM[0]) if co2_sensor_exists else '----', color=CO2_ALARM[1]
 )
 co2_alarm_value.anchor_point = (0, 0)
 co2_alarm_value.anchored_position = (5, HEIGHT - 28)
 image_group.append(co2_alarm_value)
 
-co2_temp_label = Label(font_0, text="°" + TEMP_UNIT, color=CYAN)
+co2_temp_label = Label(font_0, text='°' + TEMP_UNIT, color=CYAN)
 co2_temp_label.anchor_point = (0.5, 0)
 co2_temp_label.anchored_position = ((WIDTH - 20) // 2, HEIGHT - 14)
 image_group.append(co2_temp_label)
 
-co2_temp_value = Label(font_0, text=" " if co2_sensor_exists else "--", color=CYAN)
+co2_temp_value = Label(font_0, text=' ' if co2_sensor_exists else '--', color=CYAN)
 co2_temp_value.anchor_point = (0.5, 0)
 co2_temp_value.anchored_position = ((WIDTH - 20) // 2, HEIGHT - 28)
 image_group.append(co2_temp_value)
 
-co2_humid_label = Label(font_0, text="RH", color=CYAN)
+co2_humid_label = Label(font_0, text='RH', color=CYAN)
 co2_humid_label.anchor_point = (1, 0)
 co2_humid_label.anchored_position = (WIDTH - 40, HEIGHT - 14)
 image_group.append(co2_humid_label)
 
-co2_humid_value = Label(font_0, text=" " if co2_sensor_exists else "--", color=CYAN)
+co2_humid_value = Label(font_0, text=' ' if co2_sensor_exists else '--', color=CYAN)
 co2_humid_value.anchor_point = (1, 0)
 co2_humid_value.anchored_position = (WIDTH - 40, HEIGHT - 28)
 image_group.append(co2_humid_value)
 
-co2_qual_label = Label(font_0, text=" ", color=None)
+co2_qual_label = Label(font_0, text=' ', color=None)
 co2_qual_label.anchor_point = (0.5, 0.5)
 co2_qual_label.anchored_position = ((WIDTH - 20) // 4, HEIGHT // 4)
 image_group.append(co2_qual_label)
 
-co2_label = Label(font_0, text="PPM CO2", color=BLUE)
+co2_label = Label(font_0, text='PPM CO2', color=BLUE)
 co2_label.anchor_point = (0.5, 0)
 co2_label.anchored_position = ((WIDTH - 20) // 4, 4 + (HEIGHT // 2))
 image_group.append(co2_label)
 
-co2_value = Label(font_1, text=" " if co2_sensor_exists else "---", color=WHITE)
+co2_value = Label(font_1, text=' ' if co2_sensor_exists else '---', color=WHITE)
 co2_value.anchor_point = (0.5, 1.0)
 co2_value.anchored_position = ((WIDTH - 20) // 4, HEIGHT // 2)
 image_group.append(co2_value)
 
-aqi_qual_label = Label(font_0, text=" ", color=None)
+aqi_qual_label = Label(font_0, text=' ', color=None)
 aqi_qual_label.anchor_point = (0.5, 0.5)
 aqi_qual_label.anchored_position = (((WIDTH - 26) // 4) * 3, HEIGHT // 4)
 image_group.append(aqi_qual_label)
 
-aqi_label = Label(font_0, text="AQI-US", color=BLUE)
+aqi_label = Label(font_0, text='AQI-US', color=BLUE)
 aqi_label.anchor_point = (0.5, 0)
 aqi_label.anchored_position = (((WIDTH - 26) // 4) * 3, 4 + (HEIGHT // 2))
 image_group.append(aqi_label)
 
-aqi_value = Label(font_1, text=" " if aqi_sensor_exists else "---", color=WHITE)
+aqi_value = Label(font_1, text=' ' if aqi_sensor_exists else '---', color=WHITE)
 aqi_value.anchor_point = (0.5, 1.0)
 aqi_value.anchored_position = (((WIDTH - 26) // 4) * 3, (HEIGHT // 2))
 image_group.append(aqi_value)
@@ -534,12 +539,12 @@ if co2_sensor_exists:
     scd.measurement_interval = SENSOR_INTERVAL
     sensor_valid = update_co2_image_frame(blocking=True)
 else:
-    flash_status(interpret(TRANSLATE, "NO CO2 SENSOR"), 2.0)
+    flash_status(interpret(TRANSLATE, 'NO CO2 SENSOR'), 2.0)
 
 if aqi_sensor_exists:
     update_aqi_image_frame(blocking=True)
 else:
-    flash_status(interpret(TRANSLATE, "NO AQI SENSOR"), 2.0)
+    flash_status(interpret(TRANSLATE, 'NO AQI SENSOR'), 2.0)
 
 play_tone(440, 0.1)
 play_tone(880, 0.1)
@@ -549,35 +554,35 @@ t0 = time.monotonic()  # Sensor interval timer
 while True:
     gc.collect()
     button_pressed, hold_time = panel.read_buttons()
-    if button_pressed == "calibrate":  # Recalibrate CO2 sensor
+    if button_pressed == 'calibrate':  # Recalibrate CO2 sensor
         if hold_time >= 1.0:
             if co2_sensor_exists:
-                flash_status(interpret(TRANSLATE, "CALIBRATE"), 0.5)
+                flash_status(interpret(TRANSLATE, 'CALIBRATE'), 0.5)
                 scd.forced_recalibration_reference = 400
-                print("recal ref:", scd.forced_recalibration_reference)
+                print('recal ref:', scd.forced_recalibration_reference)
             else:
-                flash_status(interpret(TRANSLATE, "NO CO2 SENSOR"), 0.5)
+                flash_status(interpret(TRANSLATE, 'NO CO2 SENSOR'), 0.5)
             play_tone(440, 0.1)  # A4
-    if button_pressed == "temperature":  # Toggle temperature units
+    if button_pressed == 'temperature':  # Toggle temperature units
         if hold_time >= 1.0:
-            flash_status(interpret(TRANSLATE, "TEMPERATURE"), 0.5)
-            if TEMP_UNIT == "F":
-                TEMP_UNIT = "C"
+            flash_status(interpret(TRANSLATE, 'TEMPERATURE'), 0.5)
+            if TEMP_UNIT == 'F':
+                TEMP_UNIT = 'C'
             else:
-                TEMP_UNIT = "F"
-            co2_temp_label.text = "°" + TEMP_UNIT
+                TEMP_UNIT = 'F'
+            co2_temp_label.text = '°' + TEMP_UNIT
             play_tone(440, 0.1)
-    if button_pressed == "language":  # Toggle language
+    if button_pressed == 'language':  # Toggle language
         if hold_time >= 1.0:
-            flash_status(interpret(TRANSLATE, "LANGUAGE"), 0.5)
+            flash_status(interpret(TRANSLATE, 'LANGUAGE'), 0.5)
             TRANSLATE = not TRANSLATE
             title_label.text = interpret(TRANSLATE, SCREEN_TITLE)
             co2_alarm_label.text = interpret(TRANSLATE, CO2_ALARM[2])
             play_tone(440, 0.1)
             if TRANSLATE:
-                flash_status(interpret(True, "ENGLISH"), 0.5)
+                flash_status(interpret(True, 'ENGLISH'), 0.5)
             else:
-                flash_status("ENGLISH", 0.5)
+                flash_status('ENGLISH', 0.5)
 
     if time.monotonic() - SENSOR_INTERVAL > t0:
         # Acquire sensors
@@ -591,8 +596,8 @@ while True:
 
     # Test CO2 alarm threshold
     if co2_sensor_exists:
-        if co2_value.text != " " and float(co2_value.text) >= CO2_ALARM[0]:
-            flash_status(interpret(TRANSLATE, "ALARM"), 0.75)
+        if co2_value.text != ' ' and float(co2_value.text) >= CO2_ALARM[0]:
+            flash_status(interpret(TRANSLATE, 'ALARM'), 0.75)
             if has_neopixel:
                 pixels.fill(RED)
             play_tone(880, 0.015)  # A5
@@ -604,5 +609,5 @@ while True:
         battery_volts = round(battery_mon.value * 6.6 / 0xFFF0, 2)
         if (not sensor_valid) and battery_volts < 3.3:
             play_tone(880, 0.030)  # A5
-            flash_status(interpret(TRANSLATE, "LOW BATTERY"), 1)
-            flash_status(str(battery_volts) + " volts", 1)
+            flash_status(interpret(TRANSLATE, 'LOW BATTERY'), 1)
+            flash_status(str(battery_volts) + ' volts', 1)
