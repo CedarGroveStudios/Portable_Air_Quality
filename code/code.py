@@ -86,9 +86,8 @@ except:
 if not aqi_sensor_exists:
     try:
         # Connect the sensor TX pin to the D3 3-pin connector
-        uart = busio.UART(None, board.D3, baudrate=9600)
         from adafruit_pm25.uart import PM25_UART
-
+        uart = busio.UART(None, board.D3, baudrate=9600)
         pm25 = PM25_UART(uart, None)
         pm25.read()
         aqi_sensor_exists = True
@@ -429,7 +428,7 @@ if co2_sensor_exists:
         stroke=1,
     )
     reference_group.append(co2_alarm_pointer)
-    image_group.append(reference_group)
+image_group.append(reference_group)
 
 co2_pointer_shadow = Rect(
     x=WIDTH - 25, y=HEIGHT + 2, width=12, height=6, fill=None, outline=BLACK, stroke=1
