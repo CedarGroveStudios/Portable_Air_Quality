@@ -43,13 +43,13 @@ def co2_ppm_to_quality(ppm_value):
     """
     # Check sensor reading using ??? breakpoints
     if ppm_value > 6000:
-        return True, 6000, RED, "OVERRANGE"
+        return True, 6000, RED, 'OVERRANGE'
     elif ppm_value > 5000:
-        return True, ppm_value, RED, "DANGER"
+        return True, ppm_value, RED, 'DANGER'
     elif ppm_value > 2000:
-        return True, ppm_value, ORANGE, "WARNING"
+        return True, ppm_value, ORANGE, 'WARNING'
     elif ppm_value > 1000:
-        return True, ppm_value, YELLOW, "POOR"
+        return True, ppm_value, YELLOW, 'POOR'
     elif ppm_value > 100:
-        return True, ppm_value, GREEN, "GOOD"
-    return False, ppm_value, BLUE, "INVALID"
+        return True, ppm_value, GREEN, 'GOOD'
+    return False, ppm_value, BLUE, 'INVALID'

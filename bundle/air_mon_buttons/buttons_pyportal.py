@@ -45,7 +45,7 @@ class Buttons:
             style=Button.RECT,
             fill_color=None,
             outline_color=0x000000,
-            name="language",
+            name='language',
             selected_fill=None,
             selected_outline=0x0000FF,
         )
@@ -61,7 +61,7 @@ class Buttons:
             style=Button.RECT,
             fill_color=None,
             outline_color=0x000000,
-            name="calibrate",
+            name='calibrate',
             selected_fill=None,
             selected_outline=0x0000FF,
         )
@@ -77,7 +77,7 @@ class Buttons:
             style=Button.RECT,
             fill_color=None,
             outline_color=0x000000,
-            name="temperature",
+            name='temperature',
             selected_fill=None,
             selected_outline=0x0000FF,
         )
@@ -100,7 +100,7 @@ class Buttons:
     def timeout(self, hold_time=1.0):
         """Select timeout duration value in seconds, positive float value."""
         if hold_time < 0 or hold_time >= 10:
-            "Invalid button timeout duration value. Must be between 0 and 10 seconds."
+            print('Invalid button timeout duration value. Must be between 0 and 10 seconds.')
             return
         self._timeout = hold_time
         return

@@ -48,26 +48,26 @@ def concentration_to_aqi(pm25_value):
     """
     # Check sensor reading using EPA breakpoints
     if pm25_value > 500:
-        return True, 500, MAROON, "OVERRANGE"
+        return True, 500, MAROON, 'OVERRANGE'
     elif pm25_value > 350:
         aqi_value = int(map_range(pm25_value, 350, 500, 400, 500))
-        return True, aqi_value, MAROON, "HAZARDOUS"
+        return True, aqi_value, MAROON, 'HAZARDOUS'
     elif pm25_value > 250:
         aqi_value = int(map_range(pm25_value, 250, 350, 300, 400))
-        return True, aqi_value, MAROON, "HAZARDOUS"
+        return True, aqi_value, MAROON, 'HAZARDOUS'
     elif pm25_value > 150:
         aqi_value = int(map_range(pm25_value, 150, 250, 200, 300))
-        return True, aqi_value, PURPLE, "V UNHEALTHY"
+        return True, aqi_value, PURPLE, 'V UNHEALTHY'
     elif pm25_value > 55:
         aqi_value = int(map_range(pm25_value, 55, 150, 150, 200))
-        return True, aqi_value, RED, "UNHEALTHY"
+        return True, aqi_value, RED, 'UNHEALTHY'
     elif pm25_value > 35:
         aqi_value = int(map_range(pm25_value, 35, 55, 100, 150))
-        return True, aqi_value, ORANGE, "SENSITIVE"
+        return True, aqi_value, ORANGE, 'SENSITIVE'
     elif pm25_value > 12:
         aqi_value = int(map_range(pm25_value, 12, 35, 50, 100))
-        return True, aqi_value, YELLOW, "MODERATE"
+        return True, aqi_value, YELLOW, 'MODERATE'
     elif pm25_value >= 0:
         aqi_value = int(map_range(pm25_value, 0, 12, 0, 50))
-        return True, aqi_value, GREEN, "GOOD"
-    return False, -1, BLUE, "INVALID"
+        return True, aqi_value, GREEN, 'GOOD'
+    return False, -1, BLUE, 'INVALID'

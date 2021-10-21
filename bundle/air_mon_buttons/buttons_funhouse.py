@@ -84,7 +84,7 @@ class Buttons:
     def timeout(self, hold_time=1.0):
         """Select timeout duration value in seconds, positive float value."""
         if hold_time < 0 or hold_time >= 10:
-            "Invalid button timeout duration value. Must be between 0 and 10 seconds."
+            print('Invalid button timeout duration value. Must be between 0 and 10 seconds.')
             return
         self._timeout = hold_time
         return
@@ -94,7 +94,7 @@ class Buttons:
         self._hold_time = 0
 
         if self._BUTTON_CALIBRATE.value:
-            self._button_pressed = "calibrate"
+            self._button_pressed = 'calibrate'
             self.calibrate_button.outline = 0x0000FF
             while self._BUTTON_CALIBRATE.value:
                 time.sleep(0.1)
@@ -102,7 +102,7 @@ class Buttons:
                 if self._hold_time >= self._timeout:
                     self.calibrate_button.outline = 0x00FF00
         if self._BUTTON_LANGUAGE.value:
-            self._button_pressed = "language"
+            self._button_pressed = 'language'
             self.language_button.outline = 0x0000FF
             while self._BUTTON_LANGUAGE.value:
                 time.sleep(0.1)
@@ -110,7 +110,7 @@ class Buttons:
                 if self._hold_time >= self._timeout:
                     self.language_button.outline = 0x00FF00
         if self._BUTTON_TEMPERATURE.value:
-            self._button_pressed = "temperature"
+            self._button_pressed = 'temperature'
             self.temperature_button.outline = 0x0000FF
             while self._BUTTON_TEMPERATURE.value:
                 time.sleep(0.1)

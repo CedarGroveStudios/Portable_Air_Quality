@@ -90,7 +90,7 @@ class Buttons:
     def timeout(self, hold_time=1.0):
         """Select timeout duration value in seconds, positive float value."""
         if hold_time < 0 or hold_time >= 10:
-            "Invalid button timeout duration value. Must be between 0 and 10 seconds."
+            print('Invalid button timeout duration value. Must be between 0 and 10 seconds.')
             return
         self._timeout = hold_time
         return
@@ -102,13 +102,13 @@ class Buttons:
         if self._buttons:
             tone(board.A0, 1319, 0.030)  # E6
             if self._buttons & self._BUTTON_CALIBRATE:
-                self._button_pressed = "calibrate"
+                self._button_pressed = 'calibrate'
                 self.calibrate_button.outline = 0x0000FF
             if self._buttons & self._BUTTON_LANGUAGE:
-                self._button_pressed = "language"
+                self._button_pressed = 'language'
                 self.language_button.outline = 0x0000FF
             if self._buttons & self._BUTTON_TEMPERATURE:
-                self._button_pressed = "temperature"
+                self._button_pressed = 'temperature'
                 self.temperature_button.outline = 0x0000FF
             self._timeout_beep = False
             while self._buttons:
