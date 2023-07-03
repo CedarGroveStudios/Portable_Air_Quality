@@ -1,2 +1,3 @@
-Adafruit CircuitPython 7.0.0 on 2021-09-20; Adafruit Pybadge with samd51j19
+Adafruit CircuitPython 8.1.0 on 2023-05-22; Adafruit Pybadge with samd51j19
 Board ID:pybadge
+UID:B309A3DE345337532020203712440AFF

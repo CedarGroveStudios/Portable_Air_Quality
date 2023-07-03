@@ -2,19 +2,16 @@
 # SPDX-License-Identifier: MIT
 
 # buttons_pybadge.py
-# 2021-09-14 v1.0.1
+# 2023-07-02 v2.0.0
 
 import board
 import time
+import keypad
 from digitalio import DigitalInOut
 from analogio import AnalogIn
 import displayio
 from adafruit_display_shapes.rect import Rect
-from gamepadshift import GamePadShift
 from simpleio import tone
-
-# from keypad import ShiftRegisterKeys  # CircuitPython v7.0.0
-# https://circuitpython.readthedocs.io/en/latest/shared-bindings/keypad/index.html#module-keypad
 
 
 class Buttons:
@@ -26,16 +23,19 @@ class Buttons:
         self._WIDTH = board.DISPLAY.width
         self._HEIGHT = board.DISPLAY.height
 
-        # Define and instantiate front panel buttons
-        self._BUTTON_TEMPERATURE = 0b00001000  # Select
-        self._BUTTON_CALIBRATE = 0b00000100  # start
-        self._BUTTON_LANGUAGE = 0b00000010  # A
-
-        self._panel = GamePadShift(
-            DigitalInOut(board.BUTTON_CLOCK),
-            DigitalInOut(board.BUTTON_OUT),
-            DigitalInOut(board.BUTTON_LATCH),
+        # Initialize ShiftRegisterKeys to read PyGamer/PyBadge buttons
+        self._panel = keypad.ShiftRegisterKeys(
+            clock=board.BUTTON_CLOCK,
+            data=board.BUTTON_OUT,
+            latch=board.BUTTON_LATCH,
+            key_count=8,
+            value_when_pressed=True,
         )
+
+        # Define and instantiate front panel buttons
+        self._BUTTON_CALIBRATE = 2  # START
+        self._BUTTON_LANGUAGE = 1  # A
+        self._BUTTON_TEMPERATURE = 3  # SELECT
 
         # Build displayio button group
         self._button_group = displayio.Group()
@@ -97,28 +97,24 @@ class Buttons:
 
     def read_buttons(self):
         self._button_pressed = None
-        self._hold_time = 0
-        self._buttons = self._panel.get_pressed()
-        if self._buttons:
-            tone(board.A0, 1319, 0.030)  # E6
-            if self._buttons & self._BUTTON_CALIBRATE:
+        # See if a panel button is pressed
+        self._buttons = self._panel.events.get()
+        if self._buttons and self._buttons.pressed:
+            if self._buttons.key_number == self._BUTTON_CALIBRATE:
                 self._button_pressed = 'calibrate'
                 self.calibrate_button.outline = 0x0000FF
-            if self._buttons & self._BUTTON_LANGUAGE:
+            if self._buttons.key_number == self._BUTTON_LANGUAGE:
                 self._button_pressed = 'language'
                 self.language_button.outline = 0x0000FF
-            if self._buttons & self._BUTTON_TEMPERATURE:
+            if self._buttons.key_number == self._BUTTON_TEMPERATURE:
                 self._button_pressed = 'temperature'
                 self.temperature_button.outline = 0x0000FF
-            self._timeout_beep = False
-            while self._buttons:
-                self._buttons = self._panel.get_pressed()
-                time.sleep(0.1)
-                self._hold_time += 0.1
-                if self._hold_time >= self._timeout and not self._timeout_beep:
-                    tone(board.A0, 1175, 0.030)  # D6
-                    self._timeout_beep = True
+
+            if self._button_pressed is not None:
+                tone(board.A0, 1175, 0.030)  # D6
+                time.sleep(0.25)
+
             self.calibrate_button.outline = None
             self.language_button.outline = None
             self.temperature_button.outline = None
-        return self._button_pressed, self._hold_time
+        return self._button_pressed, 1.0

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # air_mon_code.py
-# 2021-09-25 v1.7.5 only compatible with CircuitPython v7.0.0
+# 2021-09-25 v1.7.5
 
 import time
 import board

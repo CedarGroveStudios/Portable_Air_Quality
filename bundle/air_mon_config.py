@@ -3,7 +3,7 @@
 
 from air_mon_colors import *
 
-ALT_LANGUAGE = 'FRANCAIS'  # DEUTSCH, FRANCAIS, or PIRATE
+ALT_LANGUAGE = 'FRANCAIS'  # DEUTSCH, ESPANOL, FRANCAIS, or PIRATE
 TRANSLATE = False  # Start with alternate language
 TEMP_UNIT     = 'F'   # 'F' for Fahrenheit, 'C' for Celsius
 BRIGHTNESS    = 1.0  # 0.0 to 1.0; 0.75 typical
