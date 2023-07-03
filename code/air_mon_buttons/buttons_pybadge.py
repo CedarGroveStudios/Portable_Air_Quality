@@ -30,6 +30,7 @@ class Buttons:
             latch=board.BUTTON_LATCH,
             key_count=8,
             value_when_pressed=True,
+            max_events = 1,
         )
 
         # Define and instantiate front panel buttons
